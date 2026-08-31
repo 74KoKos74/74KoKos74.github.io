@@ -17,8 +17,21 @@ jobs:
         run: |
           curl --fail --silent --show-error --location \
             --retry 3 --retry-all-errors --connect-timeout 5 --max-time 15 \
-            https://dom-radomira.ru/healthz
-      - name: Check payment endpoint directly
+            https://dom-radomira.ru/ | grep -q 'Лесная книга Радомира'
+      - name: Check www landing
+        run: |
+          curl --fail --silent --show-error --location \
+            --retry 3 --retry-all-errors --connect-timeout 5 --max-time 15 \
+            https://www.dom-radomira.ru/ | grep -q 'Лесная книга Радомира'
+      - name: Check permanent checkout host
+        run: |
+          curl --fail --silent --show-error --location \
+            --retry 3 --retry-all-errors --connect-timeout 5 --max-time 15 \
+            https://pay.dom-radomira.ru/ | grep -q 'https://pay.dom-radomira.ru/payment/create'
+          curl --fail --silent --show-error \
+            --retry 3 --retry-all-errors --connect-timeout 5 --max-time 15 \
+            https://pay.dom-radomira.ru/payment/health | grep -q '"status":"ok"'
+      - name: Check payment endpoint by IP fallback
         run: |
           test "$(curl --insecure --silent --output /dev/null --write-out '%{http_code}' \
             --connect-timeout 5 --max-time 15 https://109.73.207.252/healthz)" = "200"
