@@ -1,0 +1,29 @@
+name: Availability check
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check public landing
+        run: |
+          curl --fail --silent --show-error --location \
+            --retry 3 --retry-all-errors --connect-timeout 5 --max-time 15 \
+            https://dom-radomira.ru/healthz
+      - name: Check payment endpoint directly
+        run: |
+          test "$(curl --insecure --silent --output /dev/null --write-out '%{http_code}' \
+            --connect-timeout 5 --max-time 15 https://109.73.207.252/healthz)" = "200"
+      - name: Check independent static copy
+        run: |
+          curl --fail --silent --show-error --location \
+            --retry 3 --retry-all-errors --connect-timeout 5 --max-time 15 \
+            https://74kokos74.github.io/
