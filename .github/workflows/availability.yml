@@ -15,9 +15,11 @@ jobs:
     steps:
       - name: Check public landing
         run: |
-          curl --fail --silent --show-error --location \
+          page="$(curl --fail --silent --show-error --location \
             --retry 3 --retry-all-errors --connect-timeout 5 --max-time 15 \
-            https://dom-radomira.ru/ | grep -q 'Лесная книга Радомира'
+            https://dom-radomira.ru/)"
+          grep -q 'Лесная книга Радомира' <<<"$page"
+          grep -q 'action="/payment/create"' <<<"$page"
       - name: Check www landing
         run: |
           curl --fail --silent --show-error --location \
@@ -27,7 +29,7 @@ jobs:
         run: |
           curl --fail --silent --show-error --location \
             --retry 3 --retry-all-errors --connect-timeout 5 --max-time 15 \
-            https://pay.dom-radomira.ru/ | grep -q 'https://pay.dom-radomira.ru/payment/create'
+            https://pay.dom-radomira.ru/ | grep -q 'action="/payment/create"'
           curl --fail --silent --show-error \
             --retry 3 --retry-all-errors --connect-timeout 5 --max-time 15 \
             https://pay.dom-radomira.ru/payment/health | grep -q '"status":"ok"'
